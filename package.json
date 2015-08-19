@@ -1,0 +1,31 @@
+{
+  "name": "mongo-repo",
+  "version": "1.0.0",
+  "description": "Fast, lightweight repository implementation over mongodb.",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dimadeveatii/mongo-repo.git"
+  },
+  "keywords": [
+    "repository",
+    "mongodb",
+    "persistence",
+    "data",
+    "dal"
+  ],
+  "author": "Dumitru Deveatii <dimadeveatii@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dimadeveatii/mongo-repo/issues"
+  },
+  "homepage": "https://github.com/dimadeveatii/mongo-repo#readme",
+  "dependencies": {
+    "mongo-dot-notation": "^1.0.1"
+  }
+}
