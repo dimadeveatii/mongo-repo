@@ -578,6 +578,60 @@ describe('#Integration tests ...', function () {
     })
   })
 
+  describe('#updating documents', function () {
+    describe('#update', function () {
+      var points
+      before(function () {
+        db.collection('points').drop()
+
+        points = [{ x: 1, y: 2 }, { x: 1, y: 3 }]
+        var repo = Repository.create(db, 'points')
+        return repo.add(points).then(function (res) { points = res })
+      })
+
+      it('returns null', function () { 
+        var repo = Repository.create(db, 'points')
+        return repo.update({_id: new ObjectID(), x: 5})
+          .should.eventually.be.null
+      })
+
+      it('when exists then is updated', function () {
+        var repo = Repository.create(db, 'points')
+        return repo.update({ _id: points[0]._id, y: 2, z: 101 })
+          .then(function () { return repo.project(points[0], {_id: 0, z: 1}) })
+          .should.eventually.deep.equal({z: 101})
+      })
+    })
+
+    describe('#updateAll', function () {
+      var points
+      before(function () {
+        db.collection('points').drop()
+
+        points = [{ x: 1, y: 2 }, { x: 1, y: 3 }]
+        var repo = Repository.create(db, 'points')
+        return repo.add(points).then(function (res) { points = res })
+      })
+
+      it('returns null', function () {
+        var repo = Repository.create(db, 'points')
+        return repo.updateAll({_id: new ObjectID()}, { x: 5 })
+          .should.eventually.be.null
+      })
+
+      it('when exists updates all', function () {
+        var repo = Repository.create(db, 'points')
+        return repo.updateAll({ x: 1 }, { y: 99 })
+          .then(function () { return repo.count({y: 99}) })
+          .should.eventually.equal(2)
+      })
+    })
+
+    after(function () {
+      db.collection('points').drop()
+    })
+  })
+
   after(function() {
     if (db) db.close()
     db = null
