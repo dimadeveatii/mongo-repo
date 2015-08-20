@@ -26,6 +26,13 @@
   },
   "homepage": "https://github.com/dimadeveatii/mongo-repo#readme",
   "dependencies": {
-    "mongo-dot-notation": "^1.0.1"
+    "mongo-dot-notation": "^1.0.1",
+    "mongodb": "^2.0.42",
+    "when": "^3.7.3"
+  },
+  "devDependencies": {
+    "chai": "^3.2.0",
+    "chai-as-promised": "^5.1.0",
+    "mocha": "^2.2.5"
   }
 }
