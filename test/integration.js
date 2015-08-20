@@ -15,14 +15,9 @@ var Repository = require('../')
 describe('#Integration tests ...', function () {
   var db
 
-  before(function (done) {
-    MongoClient.connect(connectionString, function (err, dbClient) {
-      if (err)
-        return done(new Error('In order to run integration tests please specify a valid connectionString.'))
-
-      db = dbClient
-      done()
-    })
+  before(function () {
+    return Repository.connectDB(connectionString)
+      .then(function (dbClient) { db = dbClient })
   })
 
   describe('#reading documents', function () {
@@ -220,7 +215,7 @@ describe('#Integration tests ...', function () {
     })
   })
 
-  describe.only('#projecting documents', function () {
+  describe('#projecting documents', function () {
     describe('#project', function () {
 
       var documentId
