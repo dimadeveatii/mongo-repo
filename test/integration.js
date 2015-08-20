@@ -3,14 +3,13 @@
 var chai = require("chai")
 var chaiAsPromised = require("chai-as-promised")
 chai.use(chaiAsPromised)
-
 chai.should()
-var expect = chai.expect
 
-var MongoClient = require('mongodb').MongoClient
-var ObjectID = require('mongodb').ObjectID
-var connectionString = 'mongodb://localhost:27017/integration'
 var Repository = require('../')
+var ObjectID = Repository.ObjectID
+
+// change this to run integration tests
+var connectionString = 'mongodb://localhost:27017/integration'
 
 describe('#Integration tests ...', function () {
   var db
