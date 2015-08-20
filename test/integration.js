@@ -415,6 +415,169 @@ describe('#Integration tests ...', function () {
     })
   })
 
+  describe('#adding documents', function () {
+    describe('#add', function () {
+
+      before(function () {
+        db.collection('points').drop()
+      })
+
+      it('when add returns the document with _id property', function () {
+        var document = { x: 1, y: 2 }
+        var repo = Repository.create(db, 'points')
+        return repo.add(document)
+          .should.eventually.have.property('_id')
+      })
+
+      it('when add can be queried', function () {
+        var document = { x: 1, y: 2 }
+        var repo = Repository.create(db, 'points')
+        return repo.add(document)
+          .then(function (doc) {
+            return repo.get(doc)
+              .should.eventually.deep.equal(doc)
+          })
+      })
+
+      it('when add an array returns an array of documents', function () {
+        var document1 = { x: 1, y: 2 }
+        var document2 = { x: 3, y: 4 }
+        var repo = Repository.create(db, 'points')
+        return repo.add([document1, document2])
+          .should.eventually.have.length(2)
+      })
+
+      after(function () {
+        db.collection('points').drop()
+      })
+    })
+
+    describe('#addOrUpdate', function () {
+      before(function () { 
+        db.collection('names').drop()
+      })
+
+      it('when doesn\'t exist returns the id of added doc', function () {
+        var repo = Repository.create(db, 'names')
+        var doc = { _id: new ObjectID(), name: 'test' }
+        return repo.addOrUpdate(doc)
+          .should.eventually
+          .satisfy(function (x) { return x.toString() === doc._id.toString() })
+      })
+
+      it('when doesn\'t exist then is added', function () {
+        var repo = Repository.create(db, 'names')
+        var doc = { _id: new ObjectID(), name: 'test' }
+        return repo.addOrUpdate(doc).then(function (res) { 
+          return repo.getAll(doc).should.eventually.have.length(1)
+        })
+      })
+
+      it('when exists then is not added', function () {
+        var repo = Repository.create(db, 'names')
+        var doc = { _id: new ObjectID(), name: 'test', x: 1 }
+        return repo.add(doc).then(function (res) {
+          return repo.addOrUpdate({_id: doc._id, name: 'test2', x: 1})
+            .then(function () { return repo.getAll({x: 1}) })
+            .should.eventually.have.length(1)
+        })
+      })
+
+      it('when exists then is updated', function () {
+        var repo = Repository.create(db, 'names')
+        var doc = { _id: new ObjectID(), name: 'test' }
+        return repo
+          .add(doc)
+          .then(function (res) {
+            return repo.addOrUpdate({ _id: doc._id, name: 'test2' })
+          })
+          .then(function () { return repo.get(doc) })
+          .should.eventually.have.property('name', 'test2')
+      })
+
+      it('when is updated resolves with null', function () {
+        var repo = Repository.create(db, 'names')
+        var doc = { _id: new ObjectID(), name: 'test' }
+        return repo
+          .add(doc)
+          .then(function (res) {
+            return repo.addOrUpdate({ _id: doc._id, name: 'test2' })
+          })
+          .should.eventually.be.null
+      })
+
+      after(function () {
+        db.collection('names').drop()
+      })
+    })
+
+    describe('#addOrUpdateAll', function () { 
+      before(function () {
+        db.collection('names').drop()
+      })
+
+      it('when doesn\'t exist returns the id of added doc', function () {
+        var repo = Repository.create(db, 'names')
+        var doc = { _id: new ObjectID(), name: 'test' }
+        return repo.addOrUpdateAll({_id: doc._id}, doc)
+          .should.eventually
+          .satisfy(function (x) { return x.toString() === doc._id.toString() })
+      })
+
+      it('when doesn\'t exist then is added', function () {
+        var repo = Repository.create(db, 'names')
+        var doc = { _id: new ObjectID(), name: 'test' }
+        return repo.addOrUpdateAll({ _id: doc._id }, doc).then(function (res) {
+          return repo.getAll(doc).should.eventually.have.length(1)
+        })
+      })
+
+      it('when exists then is not added', function () {
+        var repo = Repository.create(db, 'names')
+        var doc = { _id: new ObjectID(), name: 'test', x: 99 }
+        return repo.add(doc).then(function (res) {
+          return repo.addOrUpdateAll({name: 'test', x: 99}, { name: 'test2'})
+            .then(function () { return repo.getAll({ x: 99 }) })
+            .should.eventually.have.length(1)
+        })
+      })
+
+      it('when exists then updates all', function () {
+        var repo = Repository.create(db, 'names')
+        var docs = [
+          { _id: new ObjectID(), name: 'test', x: 2 },
+          { _id: new ObjectID(), name: 'test', x: 2 }]
+          return repo
+            .add(docs)
+            .then(function (res) {
+            return repo.addOrUpdateAll({name: 'test'}, { name: 'test2' })
+          })
+          .then(function () { return repo.getAll({x: 2}) })
+          .should.eventually.have.length(2)
+          .and
+          .satisfy(function (arr) { 
+            return arr[0].name === arr[1].name && 
+              arr[0].name === 'test2'
+          })
+      })
+
+      it('when is updated resolves with null', function () {
+        var repo = Repository.create(db, 'names')
+        var doc = { _id: new ObjectID(), name: 'test' }
+        return repo
+          .add(doc)
+          .then(function (res) {
+            return repo.addOrUpdateAll({ name: 'test'}, { name: 'test2' })
+          })
+          .should.eventually.be.null
+      })
+
+      after(function () {
+        db.collection('names').drop()
+      })
+    })
+  })
+
   after(function() {
     if (db) db.close()
     db = null
