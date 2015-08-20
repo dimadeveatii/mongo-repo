@@ -175,7 +175,7 @@ describe('#Integration tests ...', function () {
           .have.deep.property('[0].lastName', 'Doe2')
       })
 
-      it('when skip first returns second', function () {
+      it('when skip first resolves with second', function () {
         var repo = Repository.create(db, 'users')
         return repo.getAll({ firstName: 'John' }, 1)
           .should.eventually
@@ -184,7 +184,7 @@ describe('#Integration tests ...', function () {
           .have.deep.property('[0].lastName', 'Doe2')
       })
 
-      it('when take one returns first', function () {
+      it('when take one resolves with first', function () {
         var repo = Repository.create(db, 'users')
         return repo.getAll({ firstName: 'John' }, 0, 1)
           .should.eventually
@@ -193,7 +193,7 @@ describe('#Integration tests ...', function () {
           .have.deep.property('[0].lastName', 'Doe1')
       })
 
-      it('when skip one and take one returns second', function () {
+      it('when skip one and take one resolves with second', function () {
         var repo = Repository.create(db, 'users')
         return repo.getAll({ firstName: 'John' }, 1, 1)
           .should.eventually
@@ -202,7 +202,7 @@ describe('#Integration tests ...', function () {
           .have.deep.property('[0].lastName', 'Doe2')
       })
 
-      it('when skip one and take one with sort desc by name returns first', function () {
+      it('when skip one and take one with sort desc by name resolves with first', function () {
         var repo = Repository.create(db, 'users')
         return repo.getAll({ firstName: 'John' }, {lastName: -1}, 1, 1)
           .should.eventually
@@ -366,7 +366,7 @@ describe('#Integration tests ...', function () {
           .that.deep.equal({lastName: 'Doe2'})
       })
       
-      it('when skip first returns second projection', function () {
+      it('when skip first resolves with second projection', function () {
         var repo = Repository.create(db, 'users')
         return repo.projectAll({ firstName: 'John' }, { _id: 0, lastName: 1 }, 1)
           .should.eventually
@@ -376,7 +376,7 @@ describe('#Integration tests ...', function () {
           .that.deep.equal({ lastName: 'Doe2' })
       })
       
-      it('when take one returns first projection', function () {
+      it('when take one resolves with first projection', function () {
         var repo = Repository.create(db, 'users')
         return repo.projectAll({ firstName: 'John' }, { _id: 0, lastName: 1 }, 0, 1)
           .should.eventually
@@ -386,7 +386,7 @@ describe('#Integration tests ...', function () {
           .that.deep.equal({ lastName: 'Doe1' })
       })
       
-      it('when skip one and take one returns second projection', function () {
+      it('when skip one and take one resolves with second projection', function () {
         var repo = Repository.create(db, 'users')
         return repo.projectAll({ firstName: 'John' }, { _id: 0, lastName: 1 }, 1, 1)
           .should.eventually
@@ -396,7 +396,7 @@ describe('#Integration tests ...', function () {
           .that.deep.equal({ lastName: 'Doe2' })
       })
       
-      it('when skip one and take one with sort desc by name returns first projection', function () {
+      it('when skip one and take one with sort desc by name resolves with first projection', function () {
         var repo = Repository.create(db, 'users')
         return repo.projectAll({ firstName: 'John' }, { _id: 0, lastName: 1}, { lastName: -1 }, 1, 1)
           .should.eventually
@@ -422,7 +422,7 @@ describe('#Integration tests ...', function () {
         db.collection('points').drop()
       })
 
-      it('when add returns the document with _id property', function () {
+      it('when add resolves with the document with _id property', function () {
         var document = { x: 1, y: 2 }
         var repo = Repository.create(db, 'points')
         return repo.add(document)
@@ -439,7 +439,7 @@ describe('#Integration tests ...', function () {
           })
       })
 
-      it('when add an array returns an array of documents', function () {
+      it('when add an array resolves with an array of documents', function () {
         var document1 = { x: 1, y: 2 }
         var document2 = { x: 3, y: 4 }
         var repo = Repository.create(db, 'points')
@@ -457,7 +457,7 @@ describe('#Integration tests ...', function () {
         db.collection('names').drop()
       })
 
-      it('when doesn\'t exist returns the id of added doc', function () {
+      it('when doesn\'t exist resolves with the id of added doc', function () {
         var repo = Repository.create(db, 'names')
         var doc = { _id: new ObjectID(), name: 'test' }
         return repo.addOrUpdate(doc)
@@ -516,7 +516,7 @@ describe('#Integration tests ...', function () {
         db.collection('names').drop()
       })
 
-      it('when doesn\'t exist returns the id of added doc', function () {
+      it('when doesn\'t exist resolves with the id of added doc', function () {
         var repo = Repository.create(db, 'names')
         var doc = { _id: new ObjectID(), name: 'test' }
         return repo.addOrUpdateAll({_id: doc._id}, doc)
@@ -589,7 +589,7 @@ describe('#Integration tests ...', function () {
         return repo.add(points).then(function (res) { points = res })
       })
 
-      it('returns null', function () { 
+      it('resolves with null', function () { 
         var repo = Repository.create(db, 'points')
         return repo.update({_id: new ObjectID(), x: 5})
           .should.eventually.be.null
@@ -613,7 +613,7 @@ describe('#Integration tests ...', function () {
         return repo.add(points).then(function (res) { points = res })
       })
 
-      it('returns null', function () {
+      it('resolves with null', function () {
         var repo = Repository.create(db, 'points')
         return repo.updateAll({_id: new ObjectID()}, { x: 5 })
           .should.eventually.be.null
@@ -676,6 +676,36 @@ describe('#Integration tests ...', function () {
 
     after(function () {
       db.collection('points').drop()
+    })
+  })
+
+  describe('#counting documents', function () { 
+    var points
+    before(function () {
+      points = [{ x: 1, y: 2 }, { x: 1, y: 3 }]
+      var repo = Repository.create(db, 'point2')
+      return repo.add(points).then(function (res) { points = res })
+    })
+
+    describe('#count', function () {
+      it('when collection empty resolves with 0', function () {
+        var repo = Repository.create(db, 'unknown')
+        return repo.count().should.eventually.equal(0)
+      })
+
+      it('when no criteria resolves with count of all', function () {
+        var repo = Repository.create(db, 'point2')
+        return repo.count().should.eventually.equal(2)
+      })
+
+      it('when has criteria resolves with count of all matching criteria', function () {
+        var repo = Repository.create(db, 'point2')
+        return repo.count({y: 2}).should.eventually.equal(1)
+      })
+    })
+
+    after(function () {
+      db.collection('point2').drop()
     })
   })
 
