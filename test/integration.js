@@ -632,6 +632,53 @@ describe('#Integration tests ...', function () {
     })
   })
 
+  describe('#removing documents', function () {
+    var points
+    before(function () {
+      db.collection('points').drop()
+
+      points = [{ x: 1, y: 2 }, { x: 1, y: 3 }]
+      var repo = Repository.create(db, 'points')
+      return repo.add(points).then(function (res) { points = res })
+    })
+
+    describe('#remove', function () {
+      it('when non-matching criteria then collection not modified', function () {
+        var repo = Repository.create(db, 'points')
+        return repo.remove(new ObjectID())
+          .then(function () { return repo.count() })
+          .should.eventually.equal(points.length)
+      })
+      it('when exists then is removed', function () { 
+        var p = {_id: new ObjectID(), x: 100}
+        var repo = Repository.create(db, 'points')
+        return repo.add(p)
+          .then(function () { return repo.remove(p) })
+          .then(function () { return repo.count() })
+          .should.eventually.equal(points.length)
+      })
+    })
+
+    describe('#removeAll', function () {
+      it('when non-matching criteria then collection not modified', function () { 
+        var repo = Repository.create(db, 'points')
+        return repo.removeAll({fake: 'data'})
+          .then(function () { return repo.count() })
+          .should.eventually.equal(points.length)
+      })
+      it('when exists many then removes all matching', function () { 
+        var repo = Repository.create(db, 'points')
+        return repo.removeAll({ x: 1 })
+          .then(function () { return repo.count() })
+          .should.eventually.equal(0)
+      })
+    })
+
+    after(function () {
+      db.collection('points').drop()
+    })
+  })
+
   after(function() {
     if (db) db.close()
     db = null
