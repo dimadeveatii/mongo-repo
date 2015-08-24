@@ -109,6 +109,11 @@ db.repo(collectionName).getOne(criteria)
 // @projection - an object specifying which fields to get
 db.repo(collectionName).projectOne(criteria, projection)
 
+// add if not exists, or update first document matching the criteria
+// @criteria - same style as used by mongo
+// @document - an object with fields to update
+db.repo(collectionName).addOrUpdateOne(criteria, document)
+
 // update only first document that matches the criteria
 // @criteria - same style as used by mongo
 // @document - an object with fields to update
