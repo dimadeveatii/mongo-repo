@@ -189,10 +189,12 @@ var doc = {
 db.repo('users').addOrUpdate(doc).then(function(res){
   console.log(res) // {_id: '...', name: 'johndoe', createdOn: '...'}
 }).then(function(){
-  return db.repo('users').addOrUpdate(doc._id, {email: 'john@doe.com'})
+  return db.repo('users').addOrUpdate({_id: doc._id, email: 'john@doe.com'})
 }).then(function(){
   return db.repo('users').get(doc)
 }).then(function(res){
   console.log(res) // {_id: '...', name: 'johndoe', createdOn: '...', email: 'john@doe.test'}
 })
 ```
+
+> Copyright © 2015 Dumitru Deveatii, released under the MIT license
