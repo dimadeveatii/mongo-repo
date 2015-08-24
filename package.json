@@ -1,6 +1,6 @@
 {
   "name": "mongo-repo",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Fast, lightweight repository implementation over mongodb.",
   "directories": {
     "test": "test"
