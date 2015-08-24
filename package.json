@@ -14,10 +14,11 @@
   },
   "keywords": [
     "repository",
-    "mongodb",
+    "mongo",
     "persistence",
     "data",
-    "dal"
+    "DAL",
+    "document"
   ],
   "author": "Dumitru Deveatii <dimadeveatii@gmail.com>",
   "license": "MIT",
